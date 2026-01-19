@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Supabase Insert User</title>
+  <title>Add User with RFID</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -16,13 +16,17 @@
   <input type="text" id="staff_id"><br><br>
 
   <label>Role:</label><br>
-  <input type="text" id="role"><br><br>
+  <select id="role">
+    <option value="">Select role</option>
+    <option value="staff">Staff</option>
+    <option value="officer">Officer</option>
+    <option value="admin">Admin</option>
+  </select><br><br>
 
-  <label>Fingerprint ID:</label><br>
-  <input type="text" id="fingerprint_id"><br><br>
-
-  <label>RFID UID:</label><br>
-  <input type="text" id="rfid_uid"><br><br>
+  <label>RFID Card (Available only):</label><br>
+  <select id="rfid_uid">
+    <option value="">Loading...</option>
+  </select><br><br>
 
   <button id="saveBtn">Save User</button>
 
@@ -30,41 +34,62 @@
     const SUPABASE_URL = "https://wevvbzauprknjkoozshp.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldnZiemF1cHJrbmprb296c2hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4MTMwMDksImV4cCI6MjA4NDM4OTAwOX0.z1fjSoD9a3rCpGQTaDKazc2LBB3Cti46jMD1uAhGgsY";
 
-
     const supabaseClient = supabase.createClient(
       SUPABASE_URL,
       SUPABASE_KEY
     );
 
+    // 🔹 Load available RFID cards
+    async function loadAvailableRFID() {
+      const { data: rfidCards, error } = await supabaseClient
+        .from("rfid_cards")
+        .select("uid");
+
+      const { data: usedRfids } = await supabaseClient
+        .from("users")
+        .select("rfid_uid");
+
+      const usedSet = new Set(
+        usedRfids.filter(u => u.rfid_uid).map(u => u.rfid_uid)
+      );
+
+      const select = document.getElementById("rfid_uid");
+      select.innerHTML = '<option value="">Select RFID</option>';
+
+      rfidCards.forEach(card => {
+        if (!usedSet.has(card.uid)) {
+          const opt = document.createElement("option");
+          opt.value = card.uid;
+          opt.textContent = card.uid;
+          select.appendChild(opt);
+        }
+      });
+    }
+
+    loadAvailableRFID();
+
+    // 🔹 Save user
     document.getElementById("saveBtn").addEventListener("click", async () => {
       const name = document.getElementById("name").value;
       const staff_id = document.getElementById("staff_id").value;
       const role = document.getElementById("role").value;
-      const fingerprint_id = document.getElementById("fingerprint_id").value;
       const rfid_uid = document.getElementById("rfid_uid").value;
 
-      if (!name || !staff_id || !role) {
-        alert("Please fill required fields");
+      if (!name || !staff_id || !role || !rfid_uid) {
+        alert("Please complete all fields");
         return;
       }
 
-      const { data, error } = await supabaseClient
+      const { error } = await supabaseClient
         .from("users")
-        .insert([{
-          name,
-          staff_id,
-          role,
-          fingerprint_id,
-          rfid_uid
-        }]);
-
-      console.log(data, error);
+        .insert([{ name, staff_id, role, rfid_uid }]);
 
       if (error) {
         alert("❌ Insert failed");
+        console.error(error);
       } else {
         alert("✅ User saved");
-        document.querySelectorAll("input").forEach(i => i.value = "");
+        loadAvailableRFID(); // refresh combo box
       }
     });
   </script>
