@@ -1,29 +1,4 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Supabase Test Insert</title>
-</head>
-<body>
-  <button id="test-btn">Insert Test User</button>
-
-  <script>
-    const SUPABASE_URL = "https://YOUR_PROJECT.supabase.co"; // your Supabase URL
-    const SUPABASE_KEY = "YOUR_ANON_KEY";                     // your anon public key
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    document.getElementById('test-btn').addEventListener('click', async () => {
-      const { data, error } = await supabase.from('users').insert([{
-        name: 'Test Name',
-        staff_id: 'T001',
-        role: 'staff',
-        fingerprint_id: 'FP001',
-        rfid_uid: '162E1504'
-      }]);
-      console.log("Insert data:", data);
-      console.log("Insert error:", error);
-      alert(error ? "Insert failed! Check console." : "Insert successful!");
-    });
-  </script>
-</body>
+hello world
 </html>
