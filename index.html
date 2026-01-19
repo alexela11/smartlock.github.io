@@ -3,40 +3,97 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Staff Registration</title>
+<title>Supabase SQL Editor</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-100 p-6">
 
-<div class="max-w-xl mx-auto bg-white p-6 rounded shadow">
-  <h2 class="text-2xl font-bold mb-4">Register New Staff</h2>
+<div class="max-w-4xl mx-auto bg-white p-6 rounded shadow">
+  <h1 class="text-2xl font-bold mb-4">Supabase SQL Editor</h1>
 
-  <form id="register-form" class="space-y-3">
-    <div>
-      <label class="block mb-1 font-semibold">Name</label>
-      <input type="text" id="name" placeholder="Full Name" class="w-full p-2 border rounded" required>
-    </div>
+  <!-- SQL Input -->
+  <div class="mb-4">
+    <label class="block mb-1 font-semibold">Enter SQL Query:</label>
+    <textarea id="sql-query" rows="5" class="w-full p-2 border rounded" placeholder="e.g., SELECT * FROM users;"></textarea>
+  </div>
 
-    <div>
-      <label class="block mb-1 font-semibold">Email</label>
-      <input type="email" id="email" placeholder="Email" class="w-full p-2 border rounded" required>
-    </div>
+  <button id="run-query-btn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Run Query</button>
 
-    <div>
-      <label class="block mb-1 font-semibold">Fingerprint ID</label>
-      <input type="number" id="fingerprint-id" placeholder="Fingerprint ID" min="1" max="127" class="w-full p-2 border rounded" required>
-    </div>
+  <!-- Status -->
+  <p id="status" class="mt-2 text-gray-700"></p>
 
-    <div>
-      <label class="block mb-1 font-semibold">RFID UID</label>
-      <input type="text" id="rfid-uid" placeholder="RFID UID (e.g., 162E1504)" class="w-full p-2 border rounded" required>
-    </div>
-
-    <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Register Staff</button>
-    <p id="status" class="mt-2 text-gray-700"></p>
-  </form>
+  <!-- Results Table -->
+  <div class="mt-4 overflow-auto">
+    <table id="results-table" class="w-full border-collapse border">
+      <thead id="results-head" class="bg-gray-200"></thead>
+      <tbody id="results-body"></tbody>
+    </table>
+  </div>
 </div>
+
+<script>
+  // -----------------------------
+  // Supabase config
+  // -----------------------------
+  const SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";
+  const SUPABASE_KEY = "YOUR_SUPABASE_API_KEY"; // anon key
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const runBtn = document.getElementById('run-query-btn');
+  const queryInput = document.getElementById('sql-query');
+  const status = document.getElementById('status');
+  const resultsHead = document.getElementById('results-head');
+  const resultsBody = document.getElementById('results-body');
+
+  runBtn.addEventListener('click', async () => {
+    const sql = queryInput.value.trim();
+    if(!sql){
+      status.innerText = "Please enter a SQL query!";
+      return;
+    }
+
+    status.innerText = "Running query...";
+    resultsHead.innerHTML = "";
+    resultsBody.innerHTML = "";
+
+    try {
+      // Supabase RPC for executing raw SQL
+      const { data, error } = await supabase.rpc('exec_sql', { sql });
+
+      if(error){
+        status.innerText = "Error: " + error.message;
+        return;
+      }
+
+      if(!data || data.length === 0){
+        status.innerText = "Query executed successfully. No results.";
+        return;
+      }
+
+      // Create table headers
+      const columns = Object.keys(data[0]);
+      let headerRow = "<tr>";
+      columns.forEach(col => headerRow += `<th class="border px-2 py-1">${col}</th>`);
+      headerRow += "</tr>";
+      resultsHead.innerHTML = headerRow;
+
+      // Create table body
+      data.forEach(row => {
+        let rowHtml = "<tr>";
+        columns.forEach(col => rowHtml += `<td class="border px-2 py-1">${row[col]}</td>`);
+        rowHtml += "</tr>";
+        resultsBody.innerHTML += rowHtml;
+      });
+
+      status.innerText = "Query executed successfully.";
+
+    } catch(err){
+      status.innerText = "Unexpected error: " + err.message;
+      console.log(err);
+    }
+  });
+</script>
 
 </body>
 </html>
