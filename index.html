@@ -1,47 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
   <title>Supabase Test</title>
-
-  <!-- Supabase JS library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-  <h2>Supabase Test Insert</h2>
-  <button id="test-btn">Insert Test User</button>
+  <h2>GitHub → Supabase Test</h2>
+  <button id="btn">Insert User</button>
 
   <script>
-    // 🔴 REPLACE THESE WITH YOUR REAL VALUES
-    const SUPABASE_URL = "https://rdmhulunpoxffpzwzqcf.supabase.co";
-  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkbWh1bHVucG94ZmZwend6cWNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3ODEzNzYsImV4cCI6MjA4NDM1NzM3Nn0.WW1Z3IpmPDolDGdcpYrLfdy2ug2dAVyzNXEMvhUqKZU";
-    // ✅ Create Supabase client
+    const SUPABASE_URL = "https://wevvbzauprknjkoozshp.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldnZiemF1cHJrbmprb296c2hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4MTMwMDksImV4cCI6MjA4NDM4OTAwOX0.z1fjSoD9a3rCpGQTaDKazc2LBB3Cti46jMD1uAhGgsY";
+
     const supabaseClient = supabase.createClient(
       SUPABASE_URL,
-      SUPABASE_ANON_KEY
+      SUPABASE_KEY
     );
 
-    // ✅ Button click
-    document.getElementById("test-btn").addEventListener("click", async () => {
+    document.getElementById("btn").addEventListener("click", async () => {
       const { data, error } = await supabaseClient
         .from("users")
         .insert([{
-          name: "Test Name",
-          staff_id: "T001",
+          name: "GitHub User",
+          staff_id: "GH001",
           role: "staff",
-          fingerprint_id: "FP001",
-          rfid_uid: "162E1504"
+          fingerprint_id: "FP123",
+          rfid_uid: "999999"
         }]);
 
-      console.log("DATA:", data);
-      console.log("ERROR:", error);
+      console.log(data, error);
 
-      if (error) {
-        alert("❌ Insert failed. Check console.");
-      } else {
-        alert("✅ Insert success! Check Supabase table.");
-      }
+      alert(error ? "❌ Failed" : "✅ Inserted");
     });
   </script>
 
