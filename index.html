@@ -1,13 +1,31 @@
-<button id="test-btn">Insert Test User</button>
-<script>
-document.getElementById('test-btn').addEventListener('click', async () => {
-  const { data, error } = await supabase.from('users').insert([{
-    name: 'Test Name',
-    staff_id: 'T001',
-    role: 'staff',
-    fingerprint_id: 'FP001',
-    rfid_uid: '162E1504'
-  }]);
-  console.log({ data, error });
-});
-</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Supabase Test Insert</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <button id="test-btn">Insert Test User</button>
+
+  <script>
+    // 1️⃣ Initialize Supabase
+    const SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";  // replace with your URL
+    const SUPABASE_KEY = "YOUR_ANON_KEY";                     // replace with anon key
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // 2️⃣ Test insert
+    document.getElementById('test-btn').addEventListener('click', async () => {
+      const { data, error } = await supabase.from('users').insert([{
+        name: 'Test Name',
+        staff_id: 'T001',
+        role: 'staff',
+        fingerprint_id: 'FP001',
+        rfid_uid: '162E1504'
+      }]);
+      console.log("Insert data:", data);
+      console.log("Insert error:", error);
+    });
+  </script>
+</body>
+</html>
