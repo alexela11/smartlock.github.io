@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Add User with RFID</title>
+  <title>Add User with Fingerprint</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -17,12 +17,8 @@
     <label>Staff ID:</label>
     <input type="text" id="staff_id">
 
-    <label>Role:</label>
-    <select id="role">
-      <option value="">Select role</option>
-      <option value="staff">Staff</option>
-      <option value="admin">Admin</option>
-    </select>
+    <label>Fingerprint No. (ID):</label>
+    <input type="text" id="fingerprint_id">
 
     <label>RFID Card (Available only):</label>
     <select id="rfid_uid">
@@ -35,7 +31,7 @@
   <div class="footer">Powered by Supabase + GitHub Pages</div>
 
   <script>
-   const SUPABASE_URL = "https://wevvbzauprknjkoozshp.supabase.co";
+    const SUPABASE_URL = "https://wevvbzauprknjkoozshp.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldnZiemF1cHJrbmprb296c2hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4MTMwMDksImV4cCI6MjA4NDM4OTAwOX0.z1fjSoD9a3rCpGQTaDKazc2LBB3Cti46jMD1uAhGgsY";
 
     const supabaseClient = supabase.createClient(
@@ -76,17 +72,17 @@
     document.getElementById("saveBtn").addEventListener("click", async () => {
       const name = document.getElementById("name").value;
       const staff_id = document.getElementById("staff_id").value;
-      const role = document.getElementById("role").value;
+      const fingerprint_id = document.getElementById("fingerprint_id").value;
       const rfid_uid = document.getElementById("rfid_uid").value;
 
-      if (!name || !staff_id || !role || !rfid_uid) {
+      if (!name || !staff_id || !fingerprint_id || !rfid_uid) {
         alert("Please complete all fields");
         return;
       }
 
       const { error } = await supabaseClient
         .from("users")
-        .insert([{ name, staff_id, role, rfid_uid }]);
+        .insert([{ name, staff_id, fingerprint_id, rfid_uid }]);
 
       if (error) {
         alert("❌ Insert failed. Check console.");
@@ -94,7 +90,6 @@
       } else {
         alert("✅ User saved");
         document.querySelectorAll("input").forEach(i => i.value = "");
-        document.getElementById("role").value = "";
         loadAvailableRFID(); // refresh combo box
       }
     });
