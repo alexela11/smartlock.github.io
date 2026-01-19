@@ -26,12 +26,10 @@
       <input type="text" id="staff-id" placeholder="Enter Staff ID" class="w-full p-2 border rounded" required>
     </div>
 
-    <!-- RFID Dropdown -->
+    <!-- RFID Input -->
     <div>
       <label class="block mb-1 font-semibold">RFID UID</label>
-      <select id="rfid-uid" class="w-full p-2 border rounded" required>
-        <option value="">Loading RFID UIDs...</option>
-      </select>
+      <input type="text" id="rfid-uid" placeholder="Enter RFID UID" class="w-full p-2 border rounded" required>
     </div>
 
     <!-- Fingerprint UID (temporary for now) -->
@@ -50,35 +48,9 @@
   // -----------------------------
   // Supabase config
   // -----------------------------
-  const SUPABASE_URL = "https://rdmhulunpoxffpzwzqcf.supabase.co";
-  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkbWh1bHVucG94ZmZwend6cWNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3ODEzNzYsImV4cCI6MjA4NDM1NzM3Nn0.WW1Z3IpmPDolDGdcpYrLfdy2ug2dAVyzNXEMvhUqKZU"; // anon key
+   const SUPABASE_URL = "https://rdmhulunpoxffpzwzqcf.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkbWh1bHVucG94ZmZwend6cWNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3ODEzNzYsImV4cCI6MjA4NDM1NzM3Nn0.WW1Z3IpmPDolDGdcpYrLfdy2ug2dAVyzNXEMvhUqKZU";
   const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-  // -----------------------------
-  // Load RFID UIDs from database
-  // -----------------------------
-  async function loadRFIDs() {
-    const { data, error } = await supabase
-      .from('rfid_cards')   // Table where RFID UIDs are stored
-      .select('uid');
-
-    const rfidSelect = document.getElementById('rfid-uid');
-    rfidSelect.innerHTML = '<option value="">Select RFID</option>'; // reset
-
-    if(data){
-      data.forEach(rfid => {
-        const option = document.createElement('option');
-        option.value = rfid.uid;
-        option.textContent = rfid.uid;
-        rfidSelect.appendChild(option);
-      });
-    } else {
-      rfidSelect.innerHTML = '<option value="">Error loading RFID</option>';
-      console.log('Error loading RFID UIDs:', error);
-    }
-  }
-
-  loadRFIDs();
 
   // -----------------------------
   // Handle form submission
@@ -92,7 +64,7 @@
 
     const name = document.getElementById('name').value.trim();
     const staffId = document.getElementById('staff-id').value.trim();
-    const rfid_uid = document.getElementById('rfid-uid').value;
+    const rfid_uid = document.getElementById('rfid-uid').value.trim();
     const fingerprint_uid = document.getElementById('fingerprint-uid').value.trim();
 
     if(!name || !staffId || !rfid_uid || !fingerprint_uid){
