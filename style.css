@@ -11,7 +11,7 @@ h2 {
 }
 
 .form-container {
-  max-width: 400px;
+  max-width: 200px;
   margin: 20px auto;
   background: #fff;
   padding: 25px;
@@ -26,7 +26,7 @@ label {
 }
 
 input, select {
-  width: 100%;
+  width: 50%;
   padding: 8px 10px;
   margin-top: 5px;
   border: 1px solid #ccc;
@@ -35,7 +35,7 @@ input, select {
 }
 
 button {
-  width: 100%;
+  width: 25%;
   padding: 10px;
   margin-top: 20px;
   background-color: #4CAF50;
