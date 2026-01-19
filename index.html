@@ -2,52 +2,58 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Add User with Fingerprint</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <title>Register User</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="container">
+    <h2>Register New User</h2>
 
-  <h2>Add User</h2>
+    <!-- Back button -->
+    <a href="main.html" class="back-btn">⬅ Back to Main Menu</a>
 
-  <div class="form-container">
-    <label>Name:</label>
-    <input type="text" id="name">
+    <!-- Registration form -->
+    <div class="form-container">
+      <label>Name:</label>
+      <input type="text" id="name" placeholder="Enter full name">
 
-    <label>Staff ID:</label>
-    <input type="text" id="staff_id">
+      <label>Staff ID:</label>
+      <input type="text" id="staff_id" placeholder="Enter staff ID">
 
-    <label>Fingerprint No. (ID):</label>
-    <input type="text" id="fingerprint_id">
+      <label>Fingerprint ID:</label>
+      <input type="text" id="fingerprint_id" placeholder="Enter fingerprint ID">
 
-    <label>RFID Card (Available only):</label>
-    <select id="rfid_uid">
-      <option value="">Loading...</option>
-    </select>
+      <label>RFID Card (Available only):</label>
+      <select id="rfid_uid">
+        <option value="">Loading...</option>
+      </select>
 
-    <button id="saveBtn">Save User</button>
+      <button id="saveBtn">Save User</button>
+    </div>
   </div>
 
-  <div class="footer">Powered by Supabase + GitHub Pages</div>
-
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    // 🔴 Replace with your Supabase credentials
     const SUPABASE_URL = "https://wevvbzauprknjkoozshp.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldnZiemF1cHJrbmprb296c2hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4MTMwMDksImV4cCI6MjA4NDM4OTAwOX0.z1fjSoD9a3rCpGQTaDKazc2LBB3Cti46jMD1uAhGgsY";
 
-    const supabaseClient = supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // Load available RFID cards
     async function loadAvailableRFID() {
-      const { data: rfidCards } = await supabaseClient
+      const { data: rfidCards, error: rfidError } = await supabaseClient
         .from("rfid_cards")
         .select("uid");
 
-      const { data: usedRfids } = await supabaseClient
+      const { data: usedRfids, error: usedError } = await supabaseClient
         .from("users")
         .select("rfid_uid");
+
+      if (rfidError || usedError) {
+        console.error("Error loading RFID:", rfidError || usedError);
+        return;
+      }
 
       const usedSet = new Set(
         usedRfids.filter(u => u.rfid_uid).map(u => u.rfid_uid)
@@ -70,9 +76,9 @@
 
     // Save user
     document.getElementById("saveBtn").addEventListener("click", async () => {
-      const name = document.getElementById("name").value;
-      const staff_id = document.getElementById("staff_id").value;
-      const fingerprint_id = document.getElementById("fingerprint_id").value;
+      const name = document.getElementById("name").value.trim();
+      const staff_id = document.getElementById("staff_id").value.trim();
+      const fingerprint_id = document.getElementById("fingerprint_id").value.trim();
       const rfid_uid = document.getElementById("rfid_uid").value;
 
       if (!name || !staff_id || !fingerprint_id || !rfid_uid) {
@@ -80,20 +86,25 @@
         return;
       }
 
-      const { error } = await supabaseClient
+      const { data, error } = await supabaseClient
         .from("users")
         .insert([{ name, staff_id, fingerprint_id, rfid_uid }]);
 
+      console.log(data, error);
+
       if (error) {
         alert("❌ Insert failed. Check console.");
-        console.error(error);
       } else {
-        alert("✅ User saved");
-        document.querySelectorAll("input").forEach(i => i.value = "");
-        loadAvailableRFID(); // refresh combo box
+        alert("✅ User saved!");
+        // Clear form
+        document.getElementById("name").value = "";
+        document.getElementById("staff_id").value = "";
+        document.getElementById("fingerprint_id").value = "";
+        document.getElementById("rfid_uid").value = "";
+        // Refresh available RFID
+        loadAvailableRFID();
       }
     });
   </script>
-
 </body>
 </html>
