@@ -38,56 +38,5 @@
   </form>
 </div>
 
-<script>
-  // -----------------------------
-  // Supabase config
-  // -----------------------------
-  const SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";
-  const SUPABASE_KEY = "YOUR_SUPABASE_API_KEY";
-  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-  const form = document.getElementById('register-form');
-  const status = document.getElementById('status');
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    status.innerText = 'Registering staff...';
-
-    // Collect values
-    const name = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const fingerprint_id = parseInt(document.getElementById('fingerprint-id').value);
-    const rfid_uid = document.getElementById('rfid-uid').value.trim();
-
-    // Fail-safe validation
-    if(!name || !email || !fingerprint_id || !rfid_uid){
-      status.innerText = 'Please fill all fields correctly.';
-      return;
-    }
-
-    try {
-      // Insert into Supabase
-      const { data, error } = await supabase
-        .from('users')
-        .insert([{ 
-          name, 
-          email, 
-          role: 'staff', 
-          fingerprint_id, 
-          rfid_uid 
-        }]);
-
-      if(error){
-        status.innerText = 'Error: ' + error.message;
-      } else {
-        status.innerText = 'Staff registered successfully!';
-        form.reset();
-      }
-    } catch (err) {
-      status.innerText = 'Unexpected error: ' + err.message;
-    }
-  });
-</script>
-
 </body>
 </html>
