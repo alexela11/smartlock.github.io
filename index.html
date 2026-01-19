@@ -2,37 +2,70 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Supabase Test</title>
+  <title>Supabase Insert User</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-  <h2>GitHub → Supabase Test</h2>
-  <button id="btn">Insert User</button>
+  <h2>Add User</h2>
+
+  <label>Name:</label><br>
+  <input type="text" id="name"><br><br>
+
+  <label>Staff ID:</label><br>
+  <input type="text" id="staff_id"><br><br>
+
+  <label>Role:</label><br>
+  <input type="text" id="role"><br><br>
+
+  <label>Fingerprint ID:</label><br>
+  <input type="text" id="fingerprint_id"><br><br>
+
+  <label>RFID UID:</label><br>
+  <input type="text" id="rfid_uid"><br><br>
+
+  <button id="saveBtn">Save User</button>
 
   <script>
     const SUPABASE_URL = "https://wevvbzauprknjkoozshp.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldnZiemF1cHJrbmprb296c2hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4MTMwMDksImV4cCI6MjA4NDM4OTAwOX0.z1fjSoD9a3rCpGQTaDKazc2LBB3Cti46jMD1uAhGgsY";
+
 
     const supabaseClient = supabase.createClient(
       SUPABASE_URL,
       SUPABASE_KEY
     );
 
-    document.getElementById("btn").addEventListener("click", async () => {
+    document.getElementById("saveBtn").addEventListener("click", async () => {
+      const name = document.getElementById("name").value;
+      const staff_id = document.getElementById("staff_id").value;
+      const role = document.getElementById("role").value;
+      const fingerprint_id = document.getElementById("fingerprint_id").value;
+      const rfid_uid = document.getElementById("rfid_uid").value;
+
+      if (!name || !staff_id || !role) {
+        alert("Please fill required fields");
+        return;
+      }
+
       const { data, error } = await supabaseClient
         .from("users")
         .insert([{
-          name: "GitHub User",
-          staff_id: "GH001",
-          role: "staff",
-          fingerprint_id: "FP123",
-          rfid_uid: "999999"
+          name,
+          staff_id,
+          role,
+          fingerprint_id,
+          rfid_uid
         }]);
 
       console.log(data, error);
 
-      alert(error ? "❌ Failed" : "✅ Inserted");
+      if (error) {
+        alert("❌ Insert failed");
+      } else {
+        alert("✅ User saved");
+        document.querySelectorAll("input").forEach(i => i.value = "");
+      }
     });
   </script>
 
