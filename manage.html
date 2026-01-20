@@ -40,8 +40,8 @@
     </table>
   </div>
 
-  <!-- MODAL STEP 1 -->
-  <div id="modal1" class="modal hidden">
+  <!-- MODAL 1 -->
+  <div id="modalStep1" class="modal hidden">
     <div class="modal-box">
       <p>Do you want to delete this user?</p>
       <div class="modal-actions">
@@ -51,12 +51,12 @@
     </div>
   </div>
 
-  <!-- MODAL STEP 2 -->
-  <div id="modal2" class="modal hidden">
+  <!-- MODAL 2 -->
+  <div id="modalStep2" class="modal hidden">
     <div class="modal-box">
       <p><strong>Are you sure?</strong></p>
       <div class="modal-actions">
-        <button class="btn danger" onclick="confirmDelete()">Confirm</button>
+        <button class="btn danger" onclick="deleteUser()">Confirm</button>
         <button class="btn secondary" onclick="closeModal()">Cancel</button>
       </div>
     </div>
@@ -64,16 +64,15 @@
 
   <script>
     /* ===== SUPABASE CONFIG ===== */
-   const SUPABASE_URL = "https://wevvbzauprknjkoozshp.supabase.co";
+    const SUPABASE_URL = "https://wevvbzauprknjkoozshp.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldnZiemF1cHJrbmprb296c2hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4MTMwMDksImV4cCI6MjA4NDM4OTAwOX0.z1fjSoD9a3rCpGQTaDKazc2LBB3Cti46jMD1uAhGgsY";
-
 
     const supabaseClient = supabase.createClient(
       SUPABASE_URL,
       SUPABASE_KEY
     );
 
-    let deleteUserId = null;
+    let selectedUserId = null;
 
     /* ===== LOAD USERS ===== */
     async function loadUsers() {
@@ -85,7 +84,7 @@
       const table = document.getElementById("userTable");
       table.innerHTML = "";
 
-      if (error || !data || data.length === 0) {
+      if (error || data.length === 0) {
         table.innerHTML = `
           <tr>
             <td colspan="6">No users found</td>
@@ -116,28 +115,28 @@
 
     /* ===== DELETE FLOW ===== */
     function openDelete(userId) {
-      deleteUserId = userId;
-      document.getElementById("modal1").classList.remove("hidden");
+      selectedUserId = userId;
+      document.getElementById("modalStep1").classList.remove("hidden");
     }
 
     function goStep2() {
-      document.getElementById("modal1").classList.add("hidden");
-      document.getElementById("modal2").classList.remove("hidden");
+      document.getElementById("modalStep1").classList.add("hidden");
+      document.getElementById("modalStep2").classList.remove("hidden");
     }
 
     function closeModal() {
-      deleteUserId = null;
-      document.getElementById("modal1").classList.add("hidden");
-      document.getElementById("modal2").classList.add("hidden");
+      selectedUserId = null;
+      document.getElementById("modalStep1").classList.add("hidden");
+      document.getElementById("modalStep2").classList.add("hidden");
     }
 
-    async function confirmDelete() {
-      if (!deleteUserId) return;
+    async function deleteUser() {
+      if (!selectedUserId) return;
 
       await supabaseClient
         .from("users")
         .delete()
-        .eq("id", deleteUserId);
+        .eq("id", selectedUserId);
 
       closeModal();
       loadUsers();
