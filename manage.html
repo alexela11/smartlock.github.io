@@ -1,69 +1,80 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Manage Users</title>
+
   <link rel="stylesheet" href="stalk.css">
+
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-<div class="top-bar">
-  <a href="index.html" class="btn secondary">⬅ Back</a>
-  <a href="register.html" class="btn primary">➕ Register User</a>
-</div>
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <a href="index.html" class="btn secondary">⬅ Back</a>
+    <a href="register.html" class="btn primary">➕ Register User</a>
+  </div>
 
-<h2>Registered Users</h2>
+  <h2>Registered Users</h2>
 
-<div class="table-wrapper">
-  <table>
-    <thead>
-     <tr>
-  <th>Name</th>
-  <th>Staff ID</th>
-  <th>RFID</th>
-  <th>Fingerprint</th>
-  <th>Registered At</th>
-  <th>Action</th>
-   </tr>
-    </thead>
-    <tbody id="userTable">
-      <tr>
-        <td colspan="5">Loading users...</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-  
-<div id="confirm1" class="modal hidden">
-  <div class="modal-box">
-    <p>Do you want to delete this user?</p>
-    <div class="modal-actions">
-      <button onclick="openConfirm2()" class="btn danger">Yes</button>
-      <button onclick="closeModals()" class="btn secondary">No</button>
+  <!-- TABLE -->
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Staff ID</th>
+          <th>RFID</th>
+          <th>Fingerprint</th>
+          <th>Registered At</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="userTable">
+        <tr>
+          <td colspan="6">Loading users...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- MODAL 1 -->
+  <div id="modalStep1" class="modal hidden">
+    <div class="modal-box">
+      <p>Do you want to delete this user?</p>
+      <div class="modal-actions">
+        <button class="btn danger" onclick="goStep2()">Yes</button>
+        <button class="btn secondary" onclick="closeModal()">No</button>
+      </div>
     </div>
   </div>
-</div>
 
-<div id="confirm2" class="modal hidden">
-  <div class="modal-box">
-    <p><strong>Are you sure?</strong></p>
-    <div class="modal-actions">
-      <button onclick="confirmDelete()" class="btn danger">Confirm</button>
-      <button onclick="closeModals()" class="btn secondary">Cancel</button>
+  <!-- MODAL 2 -->
+  <div id="modalStep2" class="modal hidden">
+    <div class="modal-box">
+      <p><strong>Are you sure?</strong></p>
+      <div class="modal-actions">
+        <button class="btn danger" onclick="deleteUser()">Confirm</button>
+        <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      </div>
     </div>
   </div>
-</div>
 
   <script>
-    const SUPABASE_URL = "https://wevvbzauprknjkoozshp.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldnZiemF1cHJrbmprb296c2hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4MTMwMDksImV4cCI6MjA4NDM4OTAwOX0.z1fjSoD9a3rCpGQTaDKazc2LBB3Cti46jMD1uAhGgsY";
+    /* ===== SUPABASE CONFIG ===== */
+    const SUPABASE_URL = "PASTE_YOUR_PROJECT_URL";
+    const SUPABASE_KEY = "PASTE_YOUR_ANON_KEY";
 
     const supabaseClient = supabase.createClient(
       SUPABASE_URL,
       SUPABASE_KEY
     );
 
+    let selectedUserId = null;
+
+    /* ===== LOAD USERS ===== */
     async function loadUsers() {
       const { data, error } = await supabaseClient
         .from("users")
@@ -73,67 +84,63 @@
       const table = document.getElementById("userTable");
       table.innerHTML = "";
 
-      if (error) {
-        table.innerHTML = "<tr><td colspan='5'>Error loading users</td></tr>";
-        return;
-      }
-
-      if (data.length === 0) {
-        table.innerHTML = "<tr><td colspan='5'>No users found</td></tr>";
+      if (error || data.length === 0) {
+        table.innerHTML = `
+          <tr>
+            <td colspan="6">No users found</td>
+          </tr>
+        `;
         return;
       }
 
       data.forEach(user => {
-        const rfidCheck = user.rfid_uid ? "✔" : "✖";
-        const fpCheck = user.fingerprint_id ? "✔" : "✖";
-        const date = new Date(user.created_at).toLocaleString();
-
-        let deleteUserId = null;
-
-function askDelete(userId) {
-  deleteUserId = userId;
-  document.getElementById("confirm1").classList.remove("hidden");
-}
-
-function openConfirm2() {
-  document.getElementById("confirm1").classList.add("hidden");
-  document.getElementById("confirm2").classList.remove("hidden");
-}
-
-function closeModals() {
-  deleteUserId = null;
-  document.getElementById("confirm1").classList.add("hidden");
-  document.getElementById("confirm2").classList.add("hidden");
-}
-
-async function confirmDelete() {
-  if (!deleteUserId) return;
-
-  await supabaseClient
-    .from("users")
-    .delete()
-    .eq("id", deleteUserId);
-
-  closeModals();
-  loadUsers(); // refresh table
-}
-
         table.innerHTML += `
-  <tr>
-    <td>${user.name}</td>
-    <td>${user.staff_id}</td>
-    <td class="center">${user.rfid_uid ? "✔" : "✖"}</td>
-    <td class="center">${user.fingerprint_id ? "✔" : "✖"}</td>
-    <td>${new Date(user.created_at).toLocaleString()}</td>
-    <td class="center">
-      <button class="delete-btn" onclick="askDelete('${user.id}')">🗑️</button>
-    </td>
-  </tr>
-     `;
+          <tr>
+            <td>${user.name}</td>
+            <td>${user.staff_id}</td>
+            <td class="center">${user.rfid_uid ? "✔" : "✖"}</td>
+            <td class="center">${user.fingerprint_id ? "✔" : "✖"}</td>
+            <td>${new Date(user.created_at).toLocaleString()}</td>
+            <td class="center">
+              <button class="delete-btn" onclick="openDelete('${user.id}')">
+                🗑️
+              </button>
+            </td>
+          </tr>
+        `;
       });
     }
 
     loadUsers();
+
+    /* ===== DELETE FLOW ===== */
+    function openDelete(userId) {
+      selectedUserId = userId;
+      document.getElementById("modalStep1").classList.remove("hidden");
+    }
+
+    function goStep2() {
+      document.getElementById("modalStep1").classList.add("hidden");
+      document.getElementById("modalStep2").classList.remove("hidden");
+    }
+
+    function closeModal() {
+      selectedUserId = null;
+      document.getElementById("modalStep1").classList.add("hidden");
+      document.getElementById("modalStep2").classList.add("hidden");
+    }
+
+    async function deleteUser() {
+      if (!selectedUserId) return;
+
+      await supabaseClient
+        .from("users")
+        .delete()
+        .eq("id", selectedUserId);
+
+      closeModal();
+      loadUsers();
+    }
   </script>
 
 </body>
