@@ -92,8 +92,37 @@ tbody tr {
   transform: scale(1.2);
 }
 
-/* ===== MODAL ===== */
+/* ===== MODAL (FIXED) ===== */
 .modal {
   position: fixed;
-  inset: 0;
-  background:
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-box {
+  background: white;
+  padding: 28px 40px;
+  border-radius: 16px;
+  text-align: center;
+  min-width: 320px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+}
+
+.modal-actions {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+/* ===== HIDDEN ===== */
+.hidden {
+  display: none;
+}
