@@ -18,13 +18,14 @@
 <div class="table-wrapper">
   <table>
     <thead>
-      <tr>
-        <th>Name</th>
-        <th>Staff ID</th>
-        <th>RFID</th>
-        <th>Fingerprint</th>
-        <th>Registered At</th>
-      </tr>
+     <tr>
+  <th>Name</th>
+  <th>Staff ID</th>
+  <th>RFID</th>
+  <th>Fingerprint</th>
+  <th>Registered At</th>
+  <th>Action</th>
+   </tr>
     </thead>
     <tbody id="userTable">
       <tr>
@@ -32,6 +33,26 @@
       </tr>
     </tbody>
   </table>
+</div>
+  
+<div id="confirm1" class="modal hidden">
+  <div class="modal-box">
+    <p>Do you want to delete this user?</p>
+    <div class="modal-actions">
+      <button onclick="openConfirm2()" class="btn danger">Yes</button>
+      <button onclick="closeModals()" class="btn secondary">No</button>
+    </div>
+  </div>
+</div>
+
+<div id="confirm2" class="modal hidden">
+  <div class="modal-box">
+    <p><strong>Are you sure?</strong></p>
+    <div class="modal-actions">
+      <button onclick="confirmDelete()" class="btn danger">Confirm</button>
+      <button onclick="closeModals()" class="btn secondary">Cancel</button>
+    </div>
+  </div>
 </div>
 
   <script>
@@ -67,15 +88,48 @@
         const fpCheck = user.fingerprint_id ? "✔" : "✖";
         const date = new Date(user.created_at).toLocaleString();
 
+        let deleteUserId = null;
+
+function askDelete(userId) {
+  deleteUserId = userId;
+  document.getElementById("confirm1").classList.remove("hidden");
+}
+
+function openConfirm2() {
+  document.getElementById("confirm1").classList.add("hidden");
+  document.getElementById("confirm2").classList.remove("hidden");
+}
+
+function closeModals() {
+  deleteUserId = null;
+  document.getElementById("confirm1").classList.add("hidden");
+  document.getElementById("confirm2").classList.add("hidden");
+}
+
+async function confirmDelete() {
+  if (!deleteUserId) return;
+
+  await supabaseClient
+    .from("users")
+    .delete()
+    .eq("id", deleteUserId);
+
+  closeModals();
+  loadUsers(); // refresh table
+}
+
         table.innerHTML += `
-          <tr>
-            <td>${user.name}</td>
-            <td>${user.staff_id}</td>
-            <td class="center">${rfidCheck}</td>
-            <td class="center">${fpCheck}</td>
-            <td>${date}</td>
-          </tr>
-        `;
+  <tr>
+    <td>${user.name}</td>
+    <td>${user.staff_id}</td>
+    <td class="center">${user.rfid_uid ? "✔" : "✖"}</td>
+    <td class="center">${user.fingerprint_id ? "✔" : "✖"}</td>
+    <td>${new Date(user.created_at).toLocaleString()}</td>
+    <td class="center">
+      <button class="delete-btn" onclick="askDelete('${user.id}')">🗑️</button>
+    </td>
+  </tr>
+     `;
       });
     }
 
