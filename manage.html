@@ -8,8 +8,14 @@
 </head>
 <body>
 
-  <h2>Registered Users</h2>
+<div class="top-bar">
+  <a href="index.html" class="btn secondary">⬅ Back</a>
+  <a href="register.html" class="btn primary">➕ Register User</a>
+</div>
 
+<h2>Registered Users</h2>
+
+<div class="table-wrapper">
   <table>
     <thead>
       <tr>
@@ -21,14 +27,12 @@
       </tr>
     </thead>
     <tbody id="userTable">
-      <tr><td colspan="5">Loading...</td></tr>
+      <tr>
+        <td colspan="5">Loading users...</td>
+      </tr>
     </tbody>
   </table>
-
-  <div class="btn-group">
-    <a href="register.html" class="btn">➕ Register New User</a>
-    <a href="index.html" class="btn secondary">⬅ Back to Main Menu</a>
-  </div>
+</div>
 
   <script>
     const SUPABASE_URL = "https://wevvbzauprknjkoozshp.supabase.co";
