@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User System</title>
+    <link rel="stylesheet" href="Stur.css">
+</head>
+
+<body>
+
+<div class="container">
+    <h2>User System</h2>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+        <button class="tab active" onclick="showTab('dashboard', this)">Dashboard</button>
+        <button class="tab" onclick="showTab('user', this)">User Information</button>
+        <button class="tab" onclick="showTab('password', this)">Change Password</button>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="card">
+        <h3>Dashboard</h3>
+        <p class="info-text">
+            This option is under development because it requires real-time operation.
+        </p>
+    </div>
+
+    <!-- User Information -->
+    <div id="user" class="card hidden">
+        <h3>User Information</h3>
+
+        <div class="info-item">
+            <span class="icon orange">#</span>
+            <div>
+                <small>Employee Number</small>
+                <strong>EMP-2024-001</strong>
+            </div>
+        </div>
+
+        <div class="info-item">
+            <span class="icon blue">👤</span>
+            <div>
+                <small>Name of User</small>
+                <strong>John Anderson</strong>
+            </div>
+        </div>
+
+        <div class="info-item">
+            <span class="icon purple">🔒</span>
+            <div>
+                <small>Password</small>
+                <strong>••••••••</strong>
+            </div>
+        </div>
+
+        <div class="info-item">
+            <span class="icon green">📞</span>
+            <div>
+                <small>Phone Number</small>
+                <strong>+1 (555) 123-4567</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password -->
+    <div id="password" class="card hidden">
+        <h3>Change Password</h3>
+
+        <form class="form">
+            <label>Last Password</label>
+            <input type="password" required>
+
+            <label>New Password</label>
+            <input type="password" required>
+
+            <label>Confirm Password</label>
+            <input type="password" required>
+
+            <button type="submit">Done</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function showTab(tabId, element) {
+    const cards = document.querySelectorAll('.card');
+    const tabs = document.querySelectorAll('.tab');
+
+    cards.forEach(card => card.classList.add('hidden'));
+    tabs.forEach(tab => tab.classList.remove('active'));
+
+    document.getElementById(tabId).classList.remove('hidden');
+    element.classList.add('active');
+}
+</script>
+
+</body>
+</html>
